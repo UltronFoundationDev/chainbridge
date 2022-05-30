@@ -6,7 +6,10 @@ package ethereum
 import (
 	"context"
 	"errors"
+	"github.com/ChainSafe/ChainBridge/bindings/Bridge"
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"math/big"
+	"strings"
 	"time"
 
 	utils "github.com/ChainSafe/ChainBridge/shared/ethereum"
@@ -35,6 +38,7 @@ func (w *writer) proposalIsComplete(srcId msg.ChainId, nonce msg.Nonce, dataHash
 		w.log.Error("Failed to check proposal existence", "err", err)
 		return false
 	}
+
 	return prop.Status == PassedStatus || prop.Status == TransferredStatus || prop.Status == CancelledStatus
 }
 
@@ -70,13 +74,16 @@ func (w *writer) hasVoted(srcId msg.ChainId, nonce msg.Nonce, dataHash [32]byte)
 
 func (w *writer) shouldVote(m msg.Message, dataHash [32]byte) bool {
 	// Check if proposal has passed and skip if Passed or Transferred
+
 	if w.proposalIsComplete(m.Source, m.DepositNonce, dataHash) {
 		w.log.Info("Proposal complete, not voting", "src", m.Source, "nonce", m.DepositNonce)
 		return false
 	}
 
 	// Check if relayer has previously voted
+
 	if w.hasVoted(m.Source, m.DepositNonce, dataHash) {
+
 		w.log.Info("Relayer has already voted, not voting", "src", m.Source, "nonce", m.DepositNonce)
 		return false
 	}
@@ -88,10 +95,9 @@ func (w *writer) shouldVote(m msg.Message, dataHash [32]byte) bool {
 // Returns true if the proposal is successfully created or is complete
 func (w *writer) createErc20Proposal(m msg.Message) bool {
 	w.log.Info("Creating erc20 proposal", "src", m.Source, "nonce", m.DepositNonce)
-
 	data := ConstructErc20ProposalData(m.Payload[0].([]byte), m.Payload[1].([]byte))
-	dataHash := utils.Hash(append(w.cfg.erc20HandlerContract.Bytes(), data...))
 
+	dataHash := utils.Hash(append(w.cfg.erc20HandlerContract.Bytes(), data...))
 	if !w.shouldVote(m, dataHash) {
 		if w.proposalIsPassed(m.Source, m.DepositNonce, dataHash) {
 			// We should not vote for this proposal but it is ready to be executed
@@ -214,6 +220,7 @@ func (w *writer) watchThenExecute(m msg.Message, data []byte, dataHash [32]byte,
 			// query for logs
 			query := buildQuery(w.cfg.bridgeContract, utils.ProposalEvent, latestBlock, latestBlock)
 			evts, err := w.conn.Client().FilterLogs(context.Background(), query)
+			parsed, err := abi.JSON(strings.NewReader(Bridge.BridgeABI))
 			if err != nil {
 				w.log.Error("Failed to fetch logs", "err", err)
 				return
@@ -221,13 +228,14 @@ func (w *writer) watchThenExecute(m msg.Message, data []byte, dataHash [32]byte,
 
 			// execute the proposal once we find the matching finalized event
 			for _, evt := range evts {
-				sourceId := evt.Topics[1].Big().Uint64()
-				depositNonce := evt.Topics[2].Big().Uint64()
-				status := evt.Topics[3].Big().Uint64()
+				out, _ := parsed.Unpack("ProposalEvent", evt.Data)
+				sourceId := abi.ConvertType(out[0], new(uint8)).(*uint8)
+				depositNonce := abi.ConvertType(out[1], new(uint64)).(*uint64)
+				status := abi.ConvertType(out[2], new(uint8)).(*uint8)
 
-				if m.Source == msg.ChainId(sourceId) &&
-					m.DepositNonce.Big().Uint64() == depositNonce &&
-					utils.IsFinalized(uint8(status)) {
+				if uint8(m.Source) == *sourceId &&
+					m.DepositNonce.Big().Uint64() == *depositNonce &&
+					utils.IsFinalized(*status) {
 					w.executeProposal(m, data, dataHash)
 					return
 				} else {
@@ -261,13 +269,17 @@ func (w *writer) voteProposal(m msg.Message, dataHash [32]byte) {
 			gasLimit := w.conn.Opts().GasLimit
 			gasPrice := w.conn.Opts().GasPrice
 
+			sliceDataHash := dataHash[:]
+
 			tx, err := w.bridgeContract.VoteProposal(
 				w.conn.Opts(),
+				uint8(m.Destination),
 				uint8(m.Source),
 				uint64(m.DepositNonce),
 				m.ResourceId,
-				dataHash,
+				sliceDataHash,
 			)
+
 			w.conn.UnlockOpts()
 
 			if err == nil {
@@ -314,10 +326,12 @@ func (w *writer) executeProposal(m msg.Message, data []byte, dataHash [32]byte) 
 
 			tx, err := w.bridgeContract.ExecuteProposal(
 				w.conn.Opts(),
+				uint8(m.Destination),
 				uint8(m.Source),
 				uint64(m.DepositNonce),
 				data,
 				m.ResourceId,
+				true,
 			)
 			w.conn.UnlockOpts()
 

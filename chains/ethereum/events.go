@@ -4,26 +4,36 @@
 package ethereum
 
 import (
+	"errors"
 	"github.com/ChainSafe/chainbridge-utils/msg"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"math/big"
 )
 
-func (l *listener) handleErc20DepositedEvent(destId msg.ChainId, nonce msg.Nonce) (msg.Message, error) {
+func (l *listener) handleErc20DepositedEvent(destId msg.ChainId, nonce msg.Nonce, resourceID msg.ResourceId, callData []byte) (msg.Message, error) {
 	l.log.Info("Handling fungible deposit event", "dest", destId, "nonce", nonce)
 
-	record, err := l.erc20HandlerContract.GetDepositRecord(&bind.CallOpts{From: l.conn.Keypair().CommonAddress()}, uint64(nonce), uint8(destId))
-	if err != nil {
-		l.log.Error("Error Unpacking ERC20 Deposit Record", "err", err)
+	if len(callData) < 84 {
+		err := errors.New("invalid calldata length: less than 84 bytes")
 		return msg.Message{}, err
 	}
+
+	// 32-64 is recipient address length
+	recipientAddressLength := big.NewInt(0).SetBytes(callData[32:64])
+
+	// 64 - (64 + recipient address length) is recipient address
+	recipientAddress := callData[64:(64 + recipientAddressLength.Int64())]
+
+	// amount: first 32 bytes of calldata
+	amount := big.NewInt(0).SetBytes(callData[:32])
 
 	return msg.NewFungibleTransfer(
 		l.cfg.id,
 		destId,
 		nonce,
-		record.Amount,
-		record.ResourceID,
-		record.DestinationRecipientAddress,
+		amount,
+		resourceID,
+		recipientAddress,
 	), nil
 }
 
