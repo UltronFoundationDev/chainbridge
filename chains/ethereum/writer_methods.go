@@ -91,17 +91,19 @@ func (w *writer) shouldVote(m msg.Message, dataHash [32]byte) bool {
 	return true
 }
 
-// createErc20Proposal creates an Erc20 proposal.
+// creatceErc20Proposal creates an Erc20 proposal.
 // Returns true if the proposal is successfully created or is complete
 func (w *writer) createErc20Proposal(m msg.Message) bool {
-	w.log.Info("Creating erc20 proposal", "src", m.Source, "nonce", m.DepositNonce)
-	data := ConstructErc20ProposalData(m.Payload[0].([]byte), m.Payload[1].([]byte))
 
+	w.log.Info("Creating erc20 proposal", "src", m.Source, "nonce", m.DepositNonce)
+
+	data := ConstructErc20ProposalData(m.Payload[0].([]byte), m.Payload[1].([]byte))
 	dataHash := utils.Hash(append(w.cfg.erc20HandlerContract.Bytes(), data...))
+
 	if !w.shouldVote(m, dataHash) {
 		if w.proposalIsPassed(m.Source, m.DepositNonce, dataHash) {
 			// We should not vote for this proposal but it is ready to be executed
-			w.executeProposal(m, data, dataHash)
+			w.log.Info("Proposal event with status passed", "src", m.Source, "dst", m.Destination, "nonce", m.DepositNonce, "rId", m.ResourceId.Hex())
 			return true
 		} else {
 			return false
@@ -116,9 +118,9 @@ func (w *writer) createErc20Proposal(m msg.Message) bool {
 	}
 
 	// watch for execution event
-	go w.watchThenExecute(m, data, dataHash, latestBlock)
+	go w.watchThenExecute(m, latestBlock)
 
-	w.voteProposal(m, dataHash)
+	w.voteProposal(m, data, dataHash)
 
 	return true
 }
@@ -149,9 +151,9 @@ func (w *writer) createErc721Proposal(m msg.Message) bool {
 	}
 
 	// watch for execution event
-	go w.watchThenExecute(m, data, dataHash, latestBlock)
+	go w.watchThenExecute(m, latestBlock)
 
-	w.voteProposal(m, dataHash)
+	w.voteProposal(m, data, dataHash)
 
 	return true
 }
@@ -184,15 +186,15 @@ func (w *writer) createGenericDepositProposal(m msg.Message) bool {
 	}
 
 	// watch for execution event
-	go w.watchThenExecute(m, data, dataHash, latestBlock)
+	go w.watchThenExecute(m, latestBlock)
 
-	w.voteProposal(m, dataHash)
+	w.voteProposal(m, data, dataHash)
 
 	return true
 }
 
 // watchThenExecute watches for the latest block and executes once the matching finalized event is found
-func (w *writer) watchThenExecute(m msg.Message, data []byte, dataHash [32]byte, latestBlock *big.Int) {
+func (w *writer) watchThenExecute(m msg.Message, latestBlock *big.Int) {
 	w.log.Info("Watching for finalization event", "src", m.Source, "nonce", m.DepositNonce)
 
 	// watching for the latest block, querying and matching the finalized event will be retried up to ExecuteBlockWatchLimit times
@@ -236,7 +238,7 @@ func (w *writer) watchThenExecute(m msg.Message, data []byte, dataHash [32]byte,
 				if uint8(m.Source) == *sourceId &&
 					m.DepositNonce.Big().Uint64() == *depositNonce &&
 					utils.IsFinalized(*status) {
-					w.executeProposal(m, data, dataHash)
+					w.log.Info("Got event with status passed", "src", *sourceId, "nonce", *depositNonce, "rId", m.ResourceId.Hex())
 					return
 				} else {
 					w.log.Trace("Ignoring event", "src", sourceId, "nonce", depositNonce)
@@ -251,7 +253,7 @@ func (w *writer) watchThenExecute(m msg.Message, data []byte, dataHash [32]byte,
 
 // voteProposal submits a vote proposal
 // a vote proposal will try to be submitted up to the TxRetryLimit times
-func (w *writer) voteProposal(m msg.Message, dataHash [32]byte) {
+func (w *writer) voteProposal(m msg.Message, data []byte, dataHash [32]byte) {
 	for i := 0; i < TxRetryLimit; i++ {
 		select {
 		case <-w.stop:
@@ -269,15 +271,13 @@ func (w *writer) voteProposal(m msg.Message, dataHash [32]byte) {
 			gasLimit := w.conn.Opts().GasLimit
 			gasPrice := w.conn.Opts().GasPrice
 
-			sliceDataHash := dataHash[:]
-
 			tx, err := w.bridgeContract.VoteProposal(
 				w.conn.Opts(),
 				uint8(m.Destination),
 				uint8(m.Source),
 				uint64(m.DepositNonce),
 				m.ResourceId,
-				sliceDataHash,
+				data,
 			)
 
 			w.conn.UnlockOpts()

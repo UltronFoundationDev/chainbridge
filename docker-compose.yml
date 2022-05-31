@@ -3,14 +3,14 @@
 
 version: '3'
 services:
-  bridge:
+  bridge_a:
     build:
       context: .
-    container_name: bridge
+    restart: on-failure
+    container_name: bridgeA
     environment:
-      - KEYSTORE_PASSWORD=password
-    command: --config /config/config.json
+      - KEYSTORE_PASSWORD=${KEY_PASS)
+    command: --config /config/config.json --latest
     volumes:
       - ./config:/config
       - ./keys:/keys/
-    network_mode: host
