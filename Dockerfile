@@ -1,6 +1,3 @@
-# Copyright 2020 ChainSafe Systems
-# SPDX-License-Identifier: LGPL-3.0-only
-
 FROM  golang:1.18-stretch AS builder
 ADD . /src
 WORKDIR /src
