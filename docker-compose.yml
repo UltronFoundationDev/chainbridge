@@ -10,7 +10,7 @@ services:
     container_name: bridge
     environment:
       KEYSTORE_PASSWORD: ${KEY_PASS}
-    command: --config /config/config.json --latest
+    command: --config /config/config.json
     volumes:
       - ./config:/config
       - ./keys:/keys/

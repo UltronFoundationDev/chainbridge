@@ -49,6 +49,23 @@ type listener struct {
 	blockConfirmations     *big.Int
 }
 
+type DepositLogs struct {
+	// ID of chain deposit will be bridged to
+	DestinationDomainID uint8
+	// ResourceID used to find address of handler to be used for deposit
+	ResourceID msg.ResourceId
+	// Nonce of deposit
+	DepositNonce uint64
+	// Address of sender (msg.sender: user)
+	SenderAddress ethcommon.Address
+	// Additional data to be passed to specified handler
+	Data []byte
+	// ERC20Handler: responds with empty data
+	// ERC721Handler: responds with deposited token metadata acquired by calling a tokenURI method in the token contract
+	// GenericHandler: responds with the raw bytes returned from the call to the target contract
+	HandlerResponse []byte
+}
+
 // NewListener creates and returns a listener
 func NewListener(conn Connection, cfg *Config, log log15.Logger, bs blockstore.Blockstorer, stop <-chan int, sysErr chan<- error, m *metrics.ChainMetrics) *listener {
 	return &listener{
@@ -157,23 +174,6 @@ func (l *listener) pollBlocks() error {
 			retry = BlockRetryLimit
 		}
 	}
-}
-
-type DepositLogs struct {
-	// ID of chain deposit will be bridged to
-	DestinationDomainID uint8
-	// ResourceID used to find address of handler to be used for deposit
-	ResourceID msg.ResourceId
-	// Nonce of deposit
-	DepositNonce uint64
-	// Address of sender (msg.sender: user)
-	SenderAddress ethcommon.Address
-	// Additional data to be passed to specified handler
-	Data []byte
-	// ERC20Handler: responds with empty data
-	// ERC721Handler: responds with deposited token metadata acquired by calling a tokenURI method in the token contract
-	// GenericHandler: responds with the raw bytes returned from the call to the target contract
-	HandlerResponse []byte
 }
 
 func (l *listener) UnpackDepositEventLog(abi abi.ABI, data []byte) (*DepositLogs, error) {
