@@ -1,6 +1,6 @@
-resource "aws_iam_policy" "graph_iam_policy" {
-  count       = var.create ? 1 : 0
-  name_prefix = "${var.project_name}-${var.environment}-graph-policy-"
+resource "aws_iam_policy" "chainbridge_iam_policy" {
+  count       = var.enabled ? 1 : 0
+  name_prefix = "${var.project_name}-${var.environment}-chainbridge-policy-"
   path        = "/"
   policy = jsonencode(
     {
@@ -50,9 +50,9 @@ resource "aws_iam_policy" "graph_iam_policy" {
   )
 }
 
-resource "aws_iam_role" "graph_role" {
-  count       = var.create ? 1 : 0
-  name_prefix = "${var.project_name}-${var.environment}-graph-role-"
+resource "aws_iam_role" "chainbridge_role" {
+  count       = var.enabled ? 1 : 0
+  name_prefix = "${var.project_name}-${var.environment}-chainbridge-role-"
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
   assume_role_policy = jsonencode({
@@ -72,27 +72,27 @@ resource "aws_iam_role" "graph_role" {
   tags = merge(
     local.tags,
     {
-      Name = "${var.project_name}-${var.environment}-graph-role"
+      Name = "${var.project_name}-${var.environment}-chainbridge-role"
     }
   )
 }
 
-resource "aws_iam_role_policy_attachment" "graph_policy_role" {
-  count      = var.create ? 1 : 0
-  role       = aws_iam_role.graph_role[count.index].name
-  policy_arn = aws_iam_policy.graph_iam_policy[count.index].arn
+resource "aws_iam_role_policy_attachment" "chainbridge_policy_role" {
+  count      = var.enabled ? 1 : 0
+  role       = aws_iam_role.chainbridge_role[count.index].name
+  policy_arn = aws_iam_policy.chainbridge_iam_policy[count.index].arn
 }
 
 resource "aws_iam_role_policy_attachment" "ssm_policy" {
-  count      = var.create ? 1 : 0
-  role       = aws_iam_role.graph_role[count.index].name
+  count      = var.enabled ? 1 : 0
+  role       = aws_iam_role.chainbridge_role[count.index].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_instance_profile" "graph_profile" {
-  count = var.create ? 1 : 0
+resource "aws_iam_instance_profile" "chainbridge_profile" {
+  count = var.enabled ? 1 : 0
   # (Optional, Forces new resource) Creates a unique name beginning with the specified prefix. Conflicts with name.
-  name_prefix = "${var.project_name}-${var.environment}-graph-profile-"
+  name_prefix = "${var.project_name}-${var.environment}-chainbridge-profile-"
   # (Optional) The role name to include in the profile.
-  role = join("", aws_iam_role.graph_role.*.name)
+  role = join("", aws_iam_role.chainbridge_role.*.name)
 }

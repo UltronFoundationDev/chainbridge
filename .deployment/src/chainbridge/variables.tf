@@ -19,7 +19,7 @@ variable "environment" {
   type        = string
 }
 
-variable "create" {
+variable "enabled" {
   description = "Whether to create resources."
   type        = bool
   default     = true
@@ -30,17 +30,22 @@ variable "aws_account_id" {
   type        = string
 }
 
-variable "ec2_instance_type" {
+variable "chainbridge_ids" {
+  description = "Chainbridge node IDs"
+  type        = list(string)
+}
+
+variable "chainbridge_instance_type" {
   description = "The type of the instance."
   type        = string
 }
 
-variable "volume_type" {
+variable "chainbridge_volume_type" {
   description = "The type of root EBS volume."
   type        = string
 }
 
-variable "volume_size" {
+variable "chainbridge_volume_size" {
   description = "The size of root EBS volume."
   type        = number
 }

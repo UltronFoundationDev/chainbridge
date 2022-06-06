@@ -53,7 +53,7 @@ data "aws_ami" "ubuntu" {
 # ------------------------------------------
 
 # ----------------------------------------------- VARIABLES definition -------------------------------------------------
-variable "graph_ssh_public_key" {
+variable "chainbridge_ssh_public_key" {
   description = "The public key material to create a SSH key pair resource."
   type        = string
   default     = ""
@@ -61,8 +61,8 @@ variable "graph_ssh_public_key" {
 #=======================================================================================================================
 
 # ----------------------------------------------- MAIN functionality ---------------------------------------------------
-resource "tls_private_key" "graph_node_ssh_key" {
-  count = var.create ? 1 : 0
+resource "tls_private_key" "chainbridge_ssh_key" {
+  count = (var.enabled && length(var.chainbridge_ssh_public_key) == 0) ? 1 : 0
   # (Required) The name of the algorithm to use for the key. Currently-supported values are "RSA" and "ECDSA".
   algorithm = "RSA"
 }
@@ -70,25 +70,28 @@ resource "tls_private_key" "graph_node_ssh_key" {
 # ---------------------------------
 # Make sure EC2 SSH key is created
 # ---------------------------------
-resource "aws_key_pair" "graph_node_ssh_key" {
-  count = var.create ? 1 : 0
+resource "aws_key_pair" "chainbridge_ssh_key" {
+  count = var.enabled ? 1 : 0
   # (Optional) Creates a unique name beginning with the specified prefix. Conflicts with key_name.
-  key_name_prefix = "graph-node-ec2-ssh-key-"
+  key_name_prefix = "chainbridge-node-ec2-ssh-key-"
   # (Required) The public key material.
-  public_key = length(var.graph_ssh_public_key) > 0 ? var.graph_ssh_public_key : join("", tls_private_key.graph_node_ssh_key.*.public_key_openssh)
+  public_key = length(var.chainbridge_ssh_public_key) > 0 ? var.chainbridge_ssh_public_key : join("", tls_private_key.chainbridge_ssh_key.*.public_key_openssh)
 }
 #=======================================================================================================================
 
 # -------------------------------------------------- EC2 Instances -----------------------------------------------------
-resource "aws_instance" "graph_node" {
-  count         = var.create ? 1 : 0
+resource "aws_instance" "chainbridge_node" {
+  for_each = {
+    for id, chainbridge_id in toset(var.chainbridge_ids) : id => chainbridge_id
+    if var.chainbridge_ids != ""
+  }
   ami           = data.aws_ami.ubuntu.id
-  instance_type = var.ec2_instance_type
-  # root_block_device {
-  #   volume_type = var.volume_type
-  #   volume_size = var.volume_size
-  # }
-  iam_instance_profile = join("", aws_iam_instance_profile.graph_profile.*.name)
+  instance_type = var.chainbridge_instance_type
+  root_block_device {
+    volume_type = var.chainbridge_volume_type
+    volume_size = var.chainbridge_volume_size
+  }
+  iam_instance_profile = join("", aws_iam_instance_profile.chainbridge_profile.*.name)
   user_data = base64encode(templatefile("${path.module}/templates/node-userdata.tpl.sh",
     {
       aws_account_id    = var.aws_account_id
@@ -96,17 +99,18 @@ resource "aws_instance" "graph_node" {
       module_name       = var.module_name
       aws_region        = var.aws_region
       environment       = var.environment
-      aws_ec2_iam_role  = join("", aws_iam_role.graph_role.*.name)
-      ec2_instance_name = "${var.project_name}-${var.module_name}-node-${count.index}"
+      aws_ec2_iam_role  = join("", aws_iam_role.chainbridge_role.*.name)
+      ec2_instance_name = "${var.project_name}-${var.module_name}-node-${each.key}"
+      chainbridge_id    = each.key
     }
   ))
-  key_name               = join("", aws_key_pair.graph_node_ssh_key.*.key_name)
+  key_name               = join("", aws_key_pair.chainbridge_ssh_key.*.key_name)
   subnet_id              = module.vpc.public_subnets[0]
-  vpc_security_group_ids = [join("", aws_security_group.graph_node.*.id)]
+  vpc_security_group_ids = [join("", aws_security_group.chainbridge.*.id)]
   tags = merge(
     local.tags,
     {
-      Name = "ultron-${var.module_name}-node-${count.index + 1}"
+      Name = "${var.project_name}-${var.environment}-${var.module_name}-node-${each.key}"
     }
   )
 }

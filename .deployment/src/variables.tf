@@ -68,6 +68,32 @@ variable "domain_name" {
   default     = null
 }
 
+variable "enabled" {
+  description = "Whether to create the resources when applying."
+  type        = bool
+  default     = true
+}
+
+variable "chainbridge_ids" {
+  description = "Chainbridge node IDs"
+  type        = list(string)
+}
+
+variable "chainbridge_instance_type" {
+  description = "The type of ec2 instance."
+  type        = string
+}
+
+variable "chainbridge_volume_type" {
+  description = "The type of root EBS volume."
+  type        = string
+}
+
+variable "chainbridge_volume_size" {
+  description = "The size of root EBS volume."
+  type        = number
+}
+
 # variable "acm_certificate_arn" {
 #   description = "The ARN of the ACM certificate for LoadBalancer issued in us-east-1."
 #   type        = string

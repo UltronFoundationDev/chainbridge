@@ -49,8 +49,8 @@ module "vpc" {
   tags = local.tags
 }
 
-resource "aws_security_group" "graph_node" {
-  count = var.create ? 1 : 0
+resource "aws_security_group" "chainbridge" {
+  count = var.enabled ? 1 : 0
 
   name_prefix = "${local.ec2_instance_name}-sg-"
   description = "Security Group for the [${local.ec2_instance_name}] EC2 instance."
@@ -63,7 +63,7 @@ resource "aws_security_group" "graph_node" {
 }
 
 resource "aws_security_group_rule" "allow_all_egress" {
-  count = var.create ? 1 : 0
+  count = var.enabled ? 1 : 0
 
   type              = "egress"
   description       = "Allow ALL Egress traffic."
@@ -71,59 +71,11 @@ resource "aws_security_group_rule" "allow_all_egress" {
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = join("", aws_security_group.graph_node.*.id)
-}
-
-# resource "aws_security_group_rule" "allow_ingress_ssh" {
-#   count = var.create ? 1 : 0
-
-#   type              = "ingress"
-#   description       = "Allow ingress SSH."
-#   from_port         = 22
-#   to_port           = 22
-#   protocol          = "tcp"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   security_group_id = join("", aws_security_group.graph_node.*.id)
-# }
-
-# resource "aws_security_group_rule" "allow_ingress_api" {
-#   count = var.create ? 1 : 0
-
-#   type              = "ingress"
-#   description       = "Allow ingress traffic to the API via default port."
-#   from_port         = 16761
-#   to_port           = 16761
-#   protocol          = "tcp"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   security_group_id = join("", aws_security_group.graph_node.*.id)
-# }
-
-resource "aws_security_group_rule" "allow_ingress_http" {
-  count = var.create ? 1 : 0
-
-  type              = "ingress"
-  description       = "Allow ingress traffic via HTTP."
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = join("", aws_security_group.graph_node.*.id)
-}
-
-resource "aws_security_group_rule" "allow_ingress_https" {
-  count = var.create ? 1 : 0
-
-  type              = "ingress"
-  description       = "Allow ingress traffic via HTTPS."
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = join("", aws_security_group.graph_node.*.id)
+  security_group_id = join("", aws_security_group.chainbridge.*.id)
 }
 
 resource "aws_security_group_rule" "allow_ingress_within_vpc" {
-  count = var.create ? 1 : 0
+  count = var.enabled ? 1 : 0
 
   type              = "ingress"
   description       = "Allow ALL ingress traffic from the VPC CIDR block."
@@ -131,5 +83,5 @@ resource "aws_security_group_rule" "allow_ingress_within_vpc" {
   to_port           = 65535
   protocol          = "-1"
   cidr_blocks       = [module.vpc.vpc_cidr_block]
-  security_group_id = join("", aws_security_group.graph_node.*.id)
+  security_group_id = join("", aws_security_group.chainbridge.*.id)
 }

@@ -48,3 +48,16 @@ systemctl enable amazon-cloudwatch-agent.service && service amazon-cloudwatch-ag
 
 #Login to Amazon ECR and run docker container
 aws ecr get-login-password --region ${aws_region} | docker login --username AWS --password-stdin ${aws_account_id}.dkr.ecr.${aws_region}.amazonaws.com
+#Start Docker container
+docker run -d \
+--restart always \
+--name ${module_name}-node-${environment}-${aws_region}-${chainbridge_id} \
+-p 5050:5050 \
+-v ./config/:/config/ \
+-v ./keys:/keys/ \
+--log-driver=awslogs \
+--log-opt awslogs-region=${aws_region} \
+--log-opt awslogs-group="/${project_name}/${environment}/${aws_region}/${module_name}/docker" \
+--log-opt awslogs-stream="${module_name}-node-${chainbridge_id}" \
+--log-opt awslogs-create-group=true \
+${aws_account_id}.dkr.ecr.${aws_region}.amazonaws.com/${module_name}-${environment}:latest bash -c '/config/config.json'
