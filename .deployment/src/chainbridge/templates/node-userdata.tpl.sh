@@ -44,18 +44,18 @@ systemctl start docker && systemctl enable docker
 systemctl enable amazon-cloudwatch-agent.service && service amazon-cloudwatch-agent start
 
 #Preparing files before starting Docker container
-mkdir -p /config
- -/config.json
-
+mkdir -p /${module_name}/{configs,keyfiles}
+echo ${base64_file} | base64 -d > /${module_name}/keyfiles/${chainbridge_pubkey}
+echo ${base64_jsonconfig} | base64 -d > /${module_name}/configs/config.json
 #Login to Amazon ECR and run docker container
 aws ecr get-login-password --region ${aws_region} | docker login --username AWS --password-stdin ${aws_account_id}.dkr.ecr.${aws_region}.amazonaws.com
 #Start Docker container
 docker run -d \
 --restart always \
 --name ${module_name}-${environment}-${aws_region}-node-${chainbridge_id} \
--p 5050:5050 \
--v 'config:/config' \
--v 'keys:/keys' \
+-v /${module_name}/keyfiles:/keys \
+-v /${module_name}/configs/config.json:/config \
+-v /${module_name}/configs/password:/config/password \
 --log-driver=awslogs \
 --log-opt awslogs-region=${aws_region} \
 --log-opt awslogs-group="/${project_name}/${environment}/${aws_region}/${module_name}/docker" \
