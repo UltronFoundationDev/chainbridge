@@ -46,9 +46,9 @@ systemctl enable amazon-cloudwatch-agent.service && service amazon-cloudwatch-ag
 #Preparing files before starting Docker container
 mkdir -p /${module_name}/{configs,keyfiles}
 
-echo -n ${base64_file} | base64 -d > /${module_name}/keyfiles/${chainbridge_pubkey}
+echo ${base64_file} | base64 -d > /${module_name}/keyfiles/${chainbridge_pubkey} --ignore-garbage
 
-echo -n ${base64_jsonconfig} | base64 -d > /${module_name}/configs/config.json
+echo ${base64_jsonconfig} | base64 -d > /${module_name}/configs/config.json --ignore-garbage
 
 echo ${chainbridge_password} > /${module_name}/configs/password
 
