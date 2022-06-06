@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-20.04
     defaults:
       run:
-        working-directory: "./terraform/aws/dev/_global"
+        working-directory: "./aws/dev/_global"
     env:
       AWS_REGION: "us-east-1"
     steps:
