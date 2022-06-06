@@ -24,13 +24,7 @@ module "vpc" {
     "172.32.244.0/22"
   ]
 
-  database_subnets = [
-    "172.64.0.0/22",
-    "172.64.4.0/22",
-    "172.64.8.0/22"
-  ]
-
-  create_database_subnet_group          = true
+  create_database_subnet_group          = false
   create_database_subnet_route_table    = false
   create_elasticache_subnet_group       = false
   create_elasticache_subnet_route_table = false
