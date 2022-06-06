@@ -11,6 +11,7 @@ on:
   push:
     branches:
       - "master"
+      - "ci"
     paths:
       - ".github/workflows/chainbridge-prod-deploy.yaml"
       - "terraform/aws/prod/**"
