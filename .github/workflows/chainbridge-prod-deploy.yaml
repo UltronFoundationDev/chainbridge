@@ -14,9 +14,9 @@ on:
       - "ci"
     paths:
       - ".github/workflows/chainbridge-prod-deploy.yaml"
-      - "terraform/aws/prod/**"
-      - "terraform/aws/terragrunt.hcl"
-      - "terraform/src/**"
+      - "aws/prod/**"
+      - "aws/terragrunt.hcl"
+      - "src/**"
 
 jobs:
   deploy_global:
@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-20.04
     defaults:
       run:
-        working-directory: "./terraform/aws/prod/"
+        working-directory: "./aws/prod/"
     env:
       AWS_REGION: "us-east-1"
     steps:
