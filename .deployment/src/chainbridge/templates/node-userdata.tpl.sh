@@ -45,8 +45,13 @@ systemctl enable amazon-cloudwatch-agent.service && service amazon-cloudwatch-ag
 
 #Preparing files before starting Docker container
 mkdir -p /${module_name}/{configs,keyfiles}
-echo ${base64_file} | base64 -d > /${module_name}/keyfiles/${chainbridge_pubkey}
-echo ${base64_jsonconfig} | base64 -d > /${module_name}/configs/config.json
+
+echo -n ${base64_file} | base64 -d > /${module_name}/keyfiles/${chainbridge_pubkey}
+
+echo -n ${base64_jsonconfig} | base64 -d > /${module_name}/configs/config.json
+
+echo ${chainbridge_password} > /${module_name}/configs/password
+
 #Login to Amazon ECR and run docker container
 aws ecr get-login-password --region ${aws_region} | docker login --username AWS --password-stdin ${aws_account_id}.dkr.ecr.${aws_region}.amazonaws.com
 #Start Docker container
