@@ -1,0 +1,118 @@
+name: Deploy DEV Environment
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+  TG_VERSION: "0.36.3"
+  TF_VERSION: "1.1.6"
+  DEPLOY_ENV: "dev"
+
+on:
+  push:
+    branches:
+      - "develop"
+    paths:
+      - ".github/workflows/chainbridge-dev-deploy.yaml"
+      - "terraform/aws/dev/**"
+      - "terraform/aws/terragrunt.hcl"
+      - "terraform/src/**"
+
+jobs:
+  deploy_global:
+    name: Deploy Global resources
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: "./terraform/aws/dev/_global"
+    env:
+      AWS_REGION: "us-east-1"
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v1.1.1
+        with:
+          terragrunt_version: ${{ env.TG_VERSION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: "Terragrunt Init"
+        run: terragrunt init -reconfigure
+
+      - name: "Terragrunt Validate"
+        run: terragrunt validate
+
+      - name: "Terragrunt Plan"
+        id: plan
+        run: terragrunt plan
+
+      - name: Terragrunt Apply
+        if: steps.plan.outcome == 'success'
+        run: echo -e "yes" | terragrunt apply -auto-approve -var environment=${{ env.DEPLOY_ENV }}
+
+  build:
+    name: Build and Push image to ECR
+    needs: deploy_global
+    runs-on: ubuntu-20.04
+    env:
+      AWS_REGION: "us-east-1"
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+          repository: UltronFoundationDev/graph-node
+          ref: dev
+
+      - name: Login to Amazon ECR
+        id: login-ecr-us-east-1
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr-us-east-1.outputs.registry }}
+          ECR_REPOSITORY: graph-node-prod
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  deploy_dev:
+    name: Deploy DEV resources
+    needs: build
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: "./terraform/aws/dev/"
+    env:
+      AWS_REGION: "us-east-1"
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v1.1.1
+        with:
+          terragrunt_version: ${{ env.TG_VERSION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: "Terragrunt Validate"
+        run: terragrunt run-all validate
+
+      - name: "Terragrunt Plan"
+        id: plan
+        run: terragrunt run-all plan
+
+      - name: Terragrunt Apply
+        if: steps.plan.outcome == 'success'
+        run: echo -e "yes" | terragrunt run-all apply -auto-approve -var environment=${{ env.DEPLOY_ENV }}
