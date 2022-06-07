@@ -39,8 +39,8 @@ inputs = {
   environment               = try(local.environment_vars.locals.environment_name, split("/", path_relative_to_include())[0])
   aws_region                = local.aws_region
   aws_account_id            = local.aws_account_id
-  chainbridge_instance_type = "t3a.medium"
   chainbridge_ids           = ["1", "2", "3"]
+  chainbridge_instance_type = "m5.2xlarge"
   chainbridge_volume_type   = "gp3"
-  chainbridge_volume_size   = "32"
+  chainbridge_volume_size   = "500"
 }
