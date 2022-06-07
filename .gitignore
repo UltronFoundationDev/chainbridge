@@ -27,6 +27,7 @@ site/
 .env
 bridge
 keys/
+blockstore/
 *.key
 
 # Chainbridge

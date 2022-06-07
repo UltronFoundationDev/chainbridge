@@ -7,7 +7,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/rs/zerolog/log"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/ChainSafe/ChainBridge/bindings/Bridge"
@@ -44,6 +47,23 @@ type listener struct {
 	latestBlock            metrics.LatestBlock
 	metrics                *metrics.ChainMetrics
 	blockConfirmations     *big.Int
+}
+
+type DepositLogs struct {
+	// ID of chain deposit will be bridged to
+	DestinationDomainID uint8
+	// ResourceID used to find address of handler to be used for deposit
+	ResourceID msg.ResourceId
+	// Nonce of deposit
+	DepositNonce uint64
+	// Address of sender (msg.sender: user)
+	SenderAddress ethcommon.Address
+	// Additional data to be passed to specified handler
+	Data []byte
+	// ERC20Handler: responds with empty data
+	// ERC721Handler: responds with deposited token metadata acquired by calling a tokenURI method in the token contract
+	// GenericHandler: responds with the raw bytes returned from the call to the target contract
+	HandlerResponse []byte
 }
 
 // NewListener creates and returns a listener
@@ -156,10 +176,22 @@ func (l *listener) pollBlocks() error {
 	}
 }
 
+func (l *listener) UnpackDepositEventLog(abi abi.ABI, data []byte) (*DepositLogs, error) {
+	var dl DepositLogs
+
+	err := abi.UnpackIntoInterface(&dl, "Deposit", data)
+	if err != nil {
+		return &DepositLogs{}, err
+	}
+
+	return &dl, nil
+}
+
 // getDepositEventsForBlock looks for the deposit event in the latest block
 func (l *listener) getDepositEventsForBlock(latestBlock *big.Int) error {
 	l.log.Debug("Querying block for deposit events", "block", latestBlock)
 	query := buildQuery(l.cfg.bridgeContract, utils.Deposit, latestBlock, latestBlock)
+	depositLogs := make([]*DepositLogs, 0)
 
 	// querying for logs
 	logs, err := l.conn.Client().FilterLogs(context.Background(), query)
@@ -167,24 +199,36 @@ func (l *listener) getDepositEventsForBlock(latestBlock *big.Int) error {
 		return fmt.Errorf("unable to Filter Logs: %w", err)
 	}
 
-	// read through the log events and handle their deposit event if handler is recognized
-	for _, log := range logs {
-		var m msg.Message
-		destId := msg.ChainId(log.Topics[1].Big().Uint64())
-		rId := msg.ResourceIdFromSlice(log.Topics[2].Bytes())
-		nonce := msg.Nonce(log.Topics[3].Big().Uint64())
+	abiBridge, err := abi.JSON(strings.NewReader(Bridge.BridgeABI))
+	if err != nil {
+		return err
+	}
 
-		addr, err := l.bridgeContract.ResourceIDToHandlerAddress(&bind.CallOpts{From: l.conn.Keypair().CommonAddress()}, rId)
+	for _, logData := range logs {
+		dl, err := l.UnpackDepositEventLog(abiBridge, logData.Data)
 		if err != nil {
-			return fmt.Errorf("failed to get handler from resource ID %x", rId)
+			log.Error().Msgf("failed unpacking deposit event log: %v", err)
+			continue
+		}
+		depositLogs = append(depositLogs, dl)
+	}
+
+	// read through the log events and handle their deposit event if handler is recognized
+	for _, depositLog := range depositLogs {
+		var m msg.Message
+
+		addr, err := l.bridgeContract.ResourceIDToHandlerAddress(&bind.CallOpts{From: l.conn.Keypair().CommonAddress()}, depositLog.ResourceID)
+
+		if err != nil {
+			return fmt.Errorf("failed to get handler from resource ID %x", depositLog.ResourceID)
 		}
 
 		if addr == l.cfg.erc20HandlerContract {
-			m, err = l.handleErc20DepositedEvent(destId, nonce)
+			m, err = l.handleErc20DepositedEvent(msg.ChainId(depositLog.DestinationDomainID), msg.Nonce(depositLog.DepositNonce), depositLog.ResourceID, depositLog.Data)
 		} else if addr == l.cfg.erc721HandlerContract {
-			m, err = l.handleErc721DepositedEvent(destId, nonce)
+			m, err = l.handleErc721DepositedEvent(msg.ChainId(depositLog.DestinationDomainID), msg.Nonce(depositLog.DepositNonce))
 		} else if addr == l.cfg.genericHandlerContract {
-			m, err = l.handleGenericDepositedEvent(destId, nonce)
+			m, err = l.handleGenericDepositedEvent(msg.ChainId(depositLog.DestinationDomainID), msg.Nonce(depositLog.DepositNonce))
 		} else {
 			l.log.Error("event has unrecognized handler", "handler", addr.Hex())
 			return nil

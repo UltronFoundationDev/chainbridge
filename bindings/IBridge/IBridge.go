@@ -27,7 +27,7 @@ var (
 )
 
 // IBridgeABI is the input ABI used to generate the binding from.
-const IBridgeABI = "[{\"inputs\":[],\"name\":\"_chainID\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+const IBridgeABI = "[{\"inputs\":[],\"name\":\"_domainID\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenAddress\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"chainId\",\"type\":\"uint8\"}],\"name\":\"getFee\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getFeeMaxValue\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"\",\"type\":\"uint128\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getFeePercent\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]"
 
 // IBridge is an auto generated Go binding around an Ethereum contract.
 type IBridge struct {
@@ -175,7 +175,7 @@ func (_IBridge *IBridgeTransactorRaw) Transact(opts *bind.TransactOpts, method s
 //
 // Solidity: function _chainID() returns(uint8)
 func (_IBridge *IBridgeTransactor) ChainID(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _IBridge.contract.Transact(opts, "_chainID")
+	return _IBridge.contract.Transact(opts, "_domainID")
 }
 
 // ChainID is a paid mutator transaction binding the contract method 0xbeab7131.
