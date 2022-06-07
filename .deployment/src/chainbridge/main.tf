@@ -114,6 +114,7 @@ resource "aws_instance" "chainbridge_node" {
       base64_jsonconfig    = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["base64_jsonconfig"]
       chainbridge_id       = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["chainbridge_id"]
       chainbridge_pubkey   = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["chainbridge_pubkey"]
+      address              = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["address"]
       chainbridge_password = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["chainbridge_password"]
     }
   ))

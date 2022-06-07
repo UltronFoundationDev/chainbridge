@@ -54,7 +54,7 @@ systemctl enable amazon-cloudwatch-agent.service && service amazon-cloudwatch-ag
 #Preparing files before starting Docker container
 mkdir -p /${module_name}/{configs,keyfiles}
 
-echo ${base64_file} | base64 -d > /${module_name}/keyfiles/${chainbridge_pubkey}.key --ignore-garbage
+echo ${base64_file} | base64 -d > /${module_name}/keyfiles/${address}.key --ignore-garbage
 
 echo ${base64_jsonconfig} | base64 -d > /${module_name}/configs/config.json --ignore-garbage
 
@@ -66,7 +66,7 @@ aws ecr get-login-password --region ${aws_region} | docker login --username AWS 
 docker run -d \
 --restart always \
 --name ${module_name}-${environment}-${aws_region}-node-${chainbridge_id} \
--v /${module_name}/keyfiles/${chainbridge_pubkey}.key:/keys/${chainbridge_pubkey}.key \
+-v /${module_name}/keyfiles/${address}.key:/keys/${address}.key \
 -v /${module_name}/configs/config.json:/config.json \
 -v /${module_name}/configs/password:/config/password \
 -e KEYSTORE_PASSWORD=${chainbridge_password} \
