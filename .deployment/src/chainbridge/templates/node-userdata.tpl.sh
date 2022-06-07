@@ -3,6 +3,7 @@ export EC2_INSTANCE_ID="$(curl -s http://169.254.169.254/latest/meta-data/instan
 export IP="$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)"
 
 alias date="date +'%Y-%m-%dT%H:%M:%S%z'"
+
 #Install packages
 apt update && apt install unzip awscli amazon-ecr-credential-helper docker.io jq -y
 
@@ -43,6 +44,13 @@ systemctl start docker && systemctl enable docker
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
 systemctl enable amazon-cloudwatch-agent.service && service amazon-cloudwatch-agent start
 
+ssm_parameter_exists=-1
+while [ $ssm_parameter_exists -ne 0 ]; do
+    echo "`date +'%F %T'` - [INFO]: Waiting until the chainbridge host сhecking if a parameter exists in the SSM settings store... \n";
+    ssm_parameter_value=$(aws ssm get-parameter --region "${aws_region}" --name "/${project_name}/${environment}/${aws_region}/${module_name}/parameters" >/dev/null; echo $?);
+    sleep 10;
+done
+
 #Preparing files before starting Docker container
 mkdir -p /${module_name}/{configs,keyfiles}
 
@@ -61,6 +69,7 @@ docker run -d \
 -v /${module_name}/keyfiles:/keys \
 -v /${module_name}/configs/config.json:/config \
 -v /${module_name}/configs/password:/config/password \
+-e KEYSTORE_PASSWORD=${chainbridge_password}
 --log-driver=awslogs \
 --log-opt awslogs-region=${aws_region} \
 --log-opt awslogs-group="/${project_name}/${environment}/${aws_region}/${module_name}/docker" \
