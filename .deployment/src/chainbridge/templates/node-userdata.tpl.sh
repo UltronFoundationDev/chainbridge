@@ -66,7 +66,7 @@ aws ecr get-login-password --region ${aws_region} | docker login --username AWS 
 docker run -d \
 --restart always \
 --name ${module_name}-${environment}-${aws_region}-node-${chainbridge_id} \
--v /${module_name}/keyfiles:/keys \
+-v /${module_name}/keyfiles/${chainbridge_pubkey}:/keys/${chainbridge_pubkey} \
 -v /${module_name}/configs/config.json:/config.json \
 -v /${module_name}/configs/password:/config/password \
 -e KEYSTORE_PASSWORD=${chainbridge_password} \
