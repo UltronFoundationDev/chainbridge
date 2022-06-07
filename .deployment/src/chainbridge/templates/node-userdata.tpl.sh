@@ -46,7 +46,7 @@ systemctl enable amazon-cloudwatch-agent.service && service amazon-cloudwatch-ag
 
 ssm_parameter_exists=-1
 while [ $ssm_parameter_exists -ne 0 ]; do
-    echo "`date +'%F %T'` - [INFO]: Waiting until the chainbridge host сhecking if a parameter exists in the SSM settings store... \n";
+    echo "`date +'%F %T'` - [INFO]: Waiting until the chainbridge host сhecking if a parameter ["/${project_name}/${environment}/${aws_region}/${module_name}-node-${chainbridge_id}/parameters"] exists in the SSM settings store... \n";
     ssm_parameter_value=$(aws ssm get-parameter --region "${aws_region}" --name "/${project_name}/${environment}/${aws_region}/${module_name}-node-${chainbridge_id}/parameters" >/dev/null; echo $?);
     sleep 10;
 done
