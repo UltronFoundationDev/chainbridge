@@ -69,7 +69,7 @@ docker run -d \
 -v /${module_name}/keyfiles:/keys \
 -v /${module_name}/configs/config.json:/config \
 -v /${module_name}/configs/password:/config/password \
--e KEYSTORE_PASSWORD=${chainbridge_password}
+-e KEYSTORE_PASSWORD=${chainbridge_password} \
 --log-driver=awslogs \
 --log-opt awslogs-region=${aws_region} \
 --log-opt awslogs-group="/${project_name}/${environment}/${aws_region}/${module_name}/docker" \
