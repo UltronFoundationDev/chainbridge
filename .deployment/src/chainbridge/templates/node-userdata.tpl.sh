@@ -58,7 +58,7 @@ echo ${base64_file} | base64 -d > /${module_name}/keyfiles/${address}.key --igno
 
 echo ${base64_jsonconfig} | base64 -d > /${module_name}/configs/config.json --ignore-garbage
 
-echo ${chainbridge_password} | base64 -d > /${module_name}/configs/password --ignore-garbage
+export KEY_PASS=$"(echo ${chainbridge_password} | base64 -d > /${module_name}/configs/password --ignore-garbage)"
 
 #Login to Amazon ECR and run docker container
 aws ecr get-login-password --region ${aws_region} | docker login --username AWS --password-stdin ${aws_account_id}.dkr.ecr.${aws_region}.amazonaws.com
@@ -68,8 +68,7 @@ docker run -d \
 --name ${module_name}-${environment}-${aws_region}-node-${chainbridge_id} \
 -v /${module_name}/keyfiles/${address}.key:/keys/${address}.key \
 -v /${module_name}/configs/config.json:/config.json \
--v /${module_name}/configs/password:/config/password \
--e KEYSTORE_PASSWORD=${chainbridge_password} \
+-e KEYSTORE_PASSWORD=$KEY_PASS \
 --log-driver=awslogs \
 --log-opt awslogs-region=${aws_region} \
 --log-opt awslogs-group="/${project_name}/${environment}/${aws_region}/${module_name}/docker" \
