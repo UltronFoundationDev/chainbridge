@@ -58,7 +58,9 @@ echo ${base64_file} | base64 -d > /${module_name}/keyfiles/${address}.key --igno
 
 echo ${base64_jsonconfig} | base64 -d > /${module_name}/configs/config.json --ignore-garbage
 
-export KEY_PASS="$(echo ${chainbridge_password} | base64 -d > /${module_name}/configs/password --ignore-garbage)"
+echo ${chainbridge_password} | base64 -d > /${module_name}/configs/password --ignore-garbage
+
+export KEY_PASS=$(cat /${module_name}/configs/password)
 
 #Login to Amazon ECR and run docker container
 aws ecr get-login-password --region ${aws_region} | docker login --username AWS --password-stdin ${aws_account_id}.dkr.ecr.${aws_region}.amazonaws.com
