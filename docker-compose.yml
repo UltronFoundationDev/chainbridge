@@ -1,3 +1,4 @@
+
 # Copyright 2020 ChainSafe Systems
 # SPDX-License-Identifier: LGPL-3.0-only
 
@@ -6,20 +7,11 @@ services:
   bridge:
     build:
       context: .
-    restart: on-failure
     container_name: bridge
     environment:
-<<<<<<< HEAD
       - KEYSTORE_PASSWORD=${KEY_PASS}
-=======
-      KEYSTORE_PASSWORD: ${KEY_PASS}
->>>>>>> origin/main
     command: --config /config/config.json
     volumes:
       - ./config/:/config/
       - ./keys:/keys/
-<<<<<<< HEAD
     network_mode: host
-=======
-      - ./blockstore:/blockstore/
->>>>>>> origin/main
