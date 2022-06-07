@@ -33,6 +33,7 @@ blockstore/
 # Chainbridge
 config.toml
 config.json
+config/config.json
 *.block
 gethdata1/
 gethdata2/

@@ -9,9 +9,17 @@ services:
     restart: on-failure
     container_name: bridge
     environment:
+<<<<<<< HEAD
+      - KEYSTORE_PASSWORD=${KEY_PASS}
+=======
       KEYSTORE_PASSWORD: ${KEY_PASS}
+>>>>>>> origin/main
     command: --config /config/config.json
     volumes:
-      - ./config:/config
+      - ./config/:/config/
       - ./keys:/keys/
+<<<<<<< HEAD
+    network_mode: host
+=======
       - ./blockstore:/blockstore/
+>>>>>>> origin/main
