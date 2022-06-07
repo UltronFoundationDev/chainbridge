@@ -15,6 +15,7 @@ import (
 
 const DefaultConfigPath = "./config.json"
 const DefaultKeystorePath = "./keys"
+const DefaultBlockStorePath = "./blockstore"
 const DefaultBlockTimeout = int64(180) // 3 minutes
 
 type Config struct {

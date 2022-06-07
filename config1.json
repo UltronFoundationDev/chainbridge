@@ -1,0 +1,68 @@
+{
+  "chains": [
+    {
+      "name": "Ultron",
+      "type": "ethereum",
+      "id": "1",
+      "endpoint": "wss://wss.ultron-rpc.net/",
+      "from": "0x102Ab63b78CA8b7250A5BD0F757De2c43012E2eB",
+      "opts": {
+        "bridge": "0xC453C52f794661C2c0856936e13df67F0eB82f9e",
+        "erc20Handler": "0x6d5a23B55CBDB0Fc7b48794d806f0bcE7Dca99E1",
+        "gasLimit": "2000000",
+        "startBlock": "10870",
+        "blockConfirmations": "2",
+        "maxGasPrice": "80000000000",
+        "http": "false"
+      }
+    },
+    {
+      "name": "Binance",
+      "type": "ethereum",
+      "id": "3",
+      "endpoint": "wss://bsc-ws-node.nariox.org:443/",
+      "from": "0x102Ab63b78CA8b7250A5BD0F757De2c43012E2eB",
+      "opts": {
+        "bridge": "0x6Ab2A602d1018987Cdcb29aE6fB6E3Ebe44b1412",
+        "erc20Handler": "0xFe21Dd0eC80e744A473770827E1aD6393A5A94F0",
+        "gasLimit": "2000000",
+        "startBlock": "18483233",
+        "blockConfirmations": "2",
+        "maxGasPrice": "80000000000",
+        "http": "false"
+      }
+    },
+    {
+      "name": "Avalanche",
+      "type": "ethereum",
+      "id": "4",
+      "endpoint": "https://avalanche.public-rpc.com/",
+      "from": "0x102Ab63b78CA8b7250A5BD0F757De2c43012E2eB",
+      "opts": {
+        "bridge": "0x6Ab2A602d1018987Cdcb29aE6fB6E3Ebe44b1412",
+        "erc20Handler": "0xFe21Dd0eC80e744A473770827E1aD6393A5A94F0",
+        "gasLimit": "2000000",
+        "startBlock": "15720320",
+        "blockConfirmations": "2",
+        "maxGasPrice": "80000000000",
+        "http": "true"
+      }
+    },
+    {
+      "name": "Fantom",
+      "type": "ethereum",
+      "id": "6",
+      "endpoint": "wss://wsapi.fantom.network/",
+      "from": "0x102Ab63b78CA8b7250A5BD0F757De2c43012E2eB",
+      "opts": {
+        "bridge": "0x400b3D2Ac98f93e14146E330210910f396f59C1E",
+        "erc20Handler": "0x598E5dBC2f6513E6cb1bA253b255A5b73A2a720b",
+        "gasLimit": "2000000",
+        "startBlock": "39995522",
+        "blockConfirmations": "2",
+        "maxGasPrice": "80000000000",
+        "http": "false"
+      }
+    }
+  ]
+}

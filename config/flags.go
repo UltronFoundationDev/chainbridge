@@ -34,7 +34,7 @@ var (
 	BlockstorePathFlag = &cli.StringFlag{
 		Name:  "blockstore",
 		Usage: "Specify path for blockstore",
-		Value: "", // Empty will use home dir
+		Value: DefaultBlockStorePath,
 	}
 
 	FreshStartFlag = &cli.BoolFlag{
