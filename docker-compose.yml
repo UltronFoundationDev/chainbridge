@@ -1,4 +1,3 @@
-
 # Copyright 2020 ChainSafe Systems
 # SPDX-License-Identifier: LGPL-3.0-only
 
@@ -14,4 +13,5 @@ services:
     volumes:
       - ./config/:/config/
       - ./keys:/keys/
+      - ./blockstore:/blockstore/
     network_mode: host

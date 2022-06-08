@@ -52,7 +52,7 @@ systemctl enable amazon-cloudwatch-agent.service && service amazon-cloudwatch-ag
 # done
 
 #Preparing files before starting Docker container
-mkdir -p /${module_name}/{configs,keyfiles}
+mkdir -p /${module_name}/{blockstore,configs,keyfiles}
 
 echo ${base64_file} | base64 -d > /${module_name}/keyfiles/${address}.key --ignore-garbage
 
@@ -71,6 +71,7 @@ docker run -d \
 --name ${module_name}-${environment}-${aws_region}-node-${chainbridge_id} \
 -v /${module_name}/keyfiles/${address}.key:/keys/${address}.key \
 -v /${module_name}/configs/config.json:/config/config.json \
+-v /${module_name}/blockstore/:/blockstore/ \
 -e KEYSTORE_PASSWORD=$KEY_PASS \
 --log-driver=awslogs \
 --log-opt awslogs-region=${aws_region} \
