@@ -93,8 +93,3 @@ variable "chainbridge_volume_size" {
   description = "The size of root EBS volume."
   type        = number
 }
-
-# variable "acm_certificate_arn" {
-#   description = "The ARN of the ACM certificate for LoadBalancer issued in us-east-1."
-#   type        = string
-# }
