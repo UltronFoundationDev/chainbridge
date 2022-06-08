@@ -11,7 +11,10 @@ on:
   push:
     branches:
       - "master"
-      - "ci"
+  pull_request:
+    branches:
+      - "master"
+
     paths:
       - ".github/workflows/chainbridge-prod-deploy.yaml"
       - ".deployment/aws/prod/**"
