@@ -3,23 +3,15 @@
 
 version: '3'
 services:
-  bridge:
-    build:
-      context: .
-    restart: on-failure
-    container_name: bridge
-    environment:
-<<<<<<< HEAD
-      - KEYSTORE_PASSWORD=${KEY_PASS}
-=======
-      KEYSTORE_PASSWORD: ${KEY_PASS}
->>>>>>> origin/main
-    command: --config /config/config.json
-    volumes:
-      - ./config/:/config/
-      - ./keys:/keys/
-<<<<<<< HEAD
-    network_mode: host
-=======
-      - ./blockstore:/blockstore/
->>>>>>> origin/main
+      bridge:
+            build:
+                  context: .
+            restart: on-failure
+            container_name: bridge
+            environment:
+                  - KEYSTORE_PASSWORD=${KEY_PASS}
+            command: --config /config/config.json
+            volumes:
+                  - ./config/:/config/
+                  - ./keys:/keys/
+            network_mode: host
