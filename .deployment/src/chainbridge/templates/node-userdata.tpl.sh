@@ -65,11 +65,12 @@ export KEY_PASS="$(cat /chainbridge/configs/password)"
 #Login to Amazon ECR and run docker container
 aws ecr get-login-password --region ${aws_region} | docker login --username AWS --password-stdin ${aws_account_id}.dkr.ecr.${aws_region}.amazonaws.com
 #Start Docker container
+sleep 10
 docker run -d \
 --restart always \
 --name ${module_name}-${environment}-${aws_region}-node-${chainbridge_id} \
 -v /${module_name}/keyfiles/${address}.key:/keys/${address}.key \
--v /${module_name}/configs/config.json:/config.json \
+-v /${module_name}/configs/config.json:/config/config.json \
 -e KEYSTORE_PASSWORD=$KEY_PASS \
 --log-driver=awslogs \
 --log-opt awslogs-region=${aws_region} \
