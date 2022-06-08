@@ -8,10 +8,10 @@ env:
   DEPLOY_ENV: "prod"
 
 on:
-  push:
-    branches:
-      - "master"
   pull_request:
+    types: 
+      - closed
+  push:
     branches:
       - "master"
 
