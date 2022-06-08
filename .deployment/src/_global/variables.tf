@@ -6,7 +6,6 @@ variable "project_name" {
 variable "module_name" {
   description = "The name of the module"
   type        = string
-  default     = "graph-node"
 }
 
 variable "aws_region" {
