@@ -32,6 +32,7 @@ blockstore/
 
 # Chainbridge
 config.toml
+config/config*.json
 config.json
 config/config.json
 *.block
