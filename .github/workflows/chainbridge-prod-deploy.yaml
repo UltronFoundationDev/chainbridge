@@ -14,13 +14,6 @@ on:
   push:
     branches:
       - "master"
-
-    paths:
-      - ".github/workflows/chainbridge-prod-deploy.yaml"
-      - ".deployment/aws/prod/**"
-      - ".deployment/aws/terragrunt.hcl"
-      - ".deployment/src/**"
-
 jobs:
   deploy_global:
     name: Deploy Global resources
