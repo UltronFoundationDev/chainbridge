@@ -19,73 +19,77 @@ const DefaultGasLimit = 6721975
 const DefaultGasPrice = 20000000000
 const DefaultMinGasPrice = 0
 const DefaultBlockConfirmations = 10
+const DefaultBlockSuccessRetryInterval = 400
 const DefaultGasMultiplier = 1
 
 // Chain specific options
 var (
-	BridgeOpt             = "bridge"
-	Erc20HandlerOpt       = "erc20Handler"
-	Erc721HandlerOpt      = "erc721Handler"
-	GenericHandlerOpt     = "genericHandler"
-	MaxGasPriceOpt        = "maxGasPrice"
-	MinGasPriceOpt        = "minGasPrice"
-	GasLimitOpt           = "gasLimit"
-	GasMultiplier         = "gasMultiplier"
-	HttpOpt               = "http"
-	StartBlockOpt         = "startBlock"
-	BlockConfirmationsOpt = "blockConfirmations"
-	EGSApiKey             = "egsApiKey"
-	EGSSpeed              = "egsSpeed"
+	BridgeOpt                    = "bridge"
+	Erc20HandlerOpt              = "erc20Handler"
+	Erc721HandlerOpt             = "erc721Handler"
+	GenericHandlerOpt            = "genericHandler"
+	MaxGasPriceOpt               = "maxGasPrice"
+	MinGasPriceOpt               = "minGasPrice"
+	GasLimitOpt                  = "gasLimit"
+	GasMultiplier                = "gasMultiplier"
+	HttpOpt                      = "http"
+	StartBlockOpt                = "startBlock"
+	BlockConfirmationsOpt        = "blockConfirmations"
+	BlockSuccessRetryIntervalOpt = "blockSuccessRetryInterval"
+	EGSApiKey                    = "egsApiKey"
+	EGSSpeed                     = "egsSpeed"
 )
 
 // Config encapsulates all necessary parameters in ethereum compatible forms
 type Config struct {
-	name                   string      // Human-readable chain name
-	id                     msg.ChainId // ChainID
-	endpoint               string      // url for rpc endpoint
-	from                   string      // address of key to use
-	keystorePath           string      // Location of keyfiles
-	blockstorePath         string
-	freshStart             bool // Disables loading from blockstore at start
-	bridgeContract         common.Address
-	erc20HandlerContract   common.Address
-	erc721HandlerContract  common.Address
-	genericHandlerContract common.Address
-	gasLimit               *big.Int
-	maxGasPrice            *big.Int
-	minGasPrice            *big.Int
-	gasMultiplier          *big.Float
-	http                   bool // Config for type of connection
-	startBlock             *big.Int
-	blockConfirmations     *big.Int
-	egsApiKey              string // API key for ethgasstation to query gas prices
-	egsSpeed               string // The speed which a transaction should be processed: average, fast, fastest. Default: fast
+	name                      string      // Human-readable chain name
+	id                        msg.ChainId // ChainID
+	endpoint                  string      // url for rpc endpoint
+	from                      string      // address of key to use
+	keystorePath              string      // Location of keyfiles
+	blockstorePath            string
+	freshStart                bool // Disables loading from blockstore at start
+	bridgeContract            common.Address
+	erc20HandlerContract      common.Address
+	erc721HandlerContract     common.Address
+	genericHandlerContract    common.Address
+	gasLimit                  *big.Int
+	maxGasPrice               *big.Int
+	minGasPrice               *big.Int
+	gasMultiplier             *big.Float
+	http                      bool // Config for type of connection
+	startBlock                *big.Int
+	blockConfirmations        *big.Int
+	blockSuccessRetryInterval *big.Int
+	egsApiKey                 string // API key for ethgasstation to query gas prices
+	egsSpeed                  string // The speed which a transaction should be processed: average, fast, fastest. Default: fast
 }
 
 // parseChainConfig uses a core.ChainConfig to construct a corresponding Config
 func parseChainConfig(chainCfg *core.ChainConfig) (*Config, error) {
 
 	config := &Config{
-		name:                   chainCfg.Name,
-		id:                     chainCfg.Id,
-		endpoint:               chainCfg.Endpoint,
-		from:                   chainCfg.From,
-		keystorePath:           chainCfg.KeystorePath,
-		blockstorePath:         chainCfg.BlockstorePath,
-		freshStart:             chainCfg.FreshStart,
-		bridgeContract:         utils.ZeroAddress,
-		erc20HandlerContract:   utils.ZeroAddress,
-		erc721HandlerContract:  utils.ZeroAddress,
-		genericHandlerContract: utils.ZeroAddress,
-		gasLimit:               big.NewInt(DefaultGasLimit),
-		maxGasPrice:            big.NewInt(DefaultGasPrice),
-		minGasPrice:            big.NewInt(DefaultMinGasPrice),
-		gasMultiplier:          big.NewFloat(DefaultGasMultiplier),
-		http:                   false,
-		startBlock:             big.NewInt(0),
-		blockConfirmations:     big.NewInt(0),
-		egsApiKey:              "",
-		egsSpeed:               "",
+		name:                      chainCfg.Name,
+		id:                        chainCfg.Id,
+		endpoint:                  chainCfg.Endpoint,
+		from:                      chainCfg.From,
+		keystorePath:              chainCfg.KeystorePath,
+		blockstorePath:            chainCfg.BlockstorePath,
+		freshStart:                chainCfg.FreshStart,
+		bridgeContract:            utils.ZeroAddress,
+		erc20HandlerContract:      utils.ZeroAddress,
+		erc721HandlerContract:     utils.ZeroAddress,
+		genericHandlerContract:    utils.ZeroAddress,
+		gasLimit:                  big.NewInt(DefaultGasLimit),
+		maxGasPrice:               big.NewInt(DefaultGasPrice),
+		minGasPrice:               big.NewInt(DefaultMinGasPrice),
+		gasMultiplier:             big.NewFloat(DefaultGasMultiplier),
+		http:                      false,
+		startBlock:                big.NewInt(0),
+		blockConfirmations:        big.NewInt(0),
+		blockSuccessRetryInterval: big.NewInt(DefaultBlockSuccessRetryInterval),
+		egsApiKey:                 "",
+		egsSpeed:                  "",
 	}
 
 	if contract, ok := chainCfg.Opts[BridgeOpt]; ok && contract != "" {
@@ -182,6 +186,20 @@ func parseChainConfig(chainCfg *core.ChainConfig) (*Config, error) {
 	} else {
 		config.blockConfirmations = big.NewInt(DefaultBlockConfirmations)
 		delete(chainCfg.Opts, BlockConfirmationsOpt)
+	}
+
+	if blockSuccessRetryInterval, ok := chainCfg.Opts[BlockSuccessRetryIntervalOpt]; ok && blockSuccessRetryInterval != "" {
+		val := big.NewInt(DefaultBlockSuccessRetryInterval)
+		_, pass := val.SetString(blockSuccessRetryInterval, 10)
+		if pass {
+			config.blockSuccessRetryInterval = val
+			delete(chainCfg.Opts, BlockSuccessRetryIntervalOpt)
+		} else {
+			return nil, fmt.Errorf("unable to parse %s", BlockSuccessRetryIntervalOpt)
+		}
+	} else {
+		config.blockConfirmations = big.NewInt(DefaultBlockSuccessRetryInterval)
+		delete(chainCfg.Opts, BlockSuccessRetryIntervalOpt)
 	}
 
 	if gsnApiKey, ok := chainCfg.Opts[EGSApiKey]; ok && gsnApiKey != "" {
