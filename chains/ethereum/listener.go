@@ -29,6 +29,8 @@ import (
 )
 
 var BlockRetryInterval = time.Second * 5
+
+//var BlockSuccessRetryInterval = time.Millisecond * 400
 var BlockRetryLimit = 5
 var ErrFatalPolling = errors.New("listener block polling failed")
 
@@ -114,7 +116,7 @@ func (l *listener) start() error {
 func (l *listener) pollBlocks() error {
 	var currentBlock = l.cfg.startBlock
 	l.log.Info("Polling Blocks...", "block", currentBlock)
-
+	var blockSuccessRetryInterval = time.Millisecond * time.Duration(l.cfg.blockSuccessRetryInterval.Int64())
 	var retry = BlockRetryLimit
 	for {
 		select {
@@ -172,6 +174,7 @@ func (l *listener) pollBlocks() error {
 			// Goto next block and reset retry counter
 			currentBlock.Add(currentBlock, big.NewInt(1))
 			retry = BlockRetryLimit
+			time.Sleep(blockSuccessRetryInterval)
 		}
 	}
 }
