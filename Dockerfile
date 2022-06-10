@@ -14,4 +14,4 @@ RUN subkey --version
 COPY --from=builder /bridge ./
 RUN chmod +x ./bridge
 
-CMD ["/bin/bash", "-c", "./bridge --verbosity trace"]
+ENTRYPOINT ["./bridge --verbosity trace"]
