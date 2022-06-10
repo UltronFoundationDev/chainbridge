@@ -78,4 +78,4 @@ docker run -d \
 --log-opt awslogs-group="/${project_name}/${environment}/${aws_region}/${module_name}/docker" \
 --log-opt awslogs-stream="${module_name}-node-${chainbridge_id}" \
 --log-opt awslogs-create-group=true \
-${aws_account_id}.dkr.ecr.${aws_region}.amazonaws.com/${module_name}-${environment}:latest bash -c '/config/config.json'
+${aws_account_id}.dkr.ecr.${aws_region}.amazonaws.com/${module_name}-${environment}:latest
