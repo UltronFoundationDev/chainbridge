@@ -15,4 +15,4 @@ COPY --from=builder /bridge ./
 RUN chmod +x ./bridge
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["./bridge", "--verbosity trace"]
+CMD ["./bridge", "--verbosity", "trace"]
