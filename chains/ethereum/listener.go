@@ -30,7 +30,6 @@ import (
 
 var BlockRetryInterval = time.Second * 5
 
-//var BlockSuccessRetryInterval = time.Millisecond * 400
 var BlockRetryLimit = 5
 var ErrFatalPolling = errors.New("listener block polling failed")
 
@@ -193,6 +192,7 @@ func (l *listener) UnpackDepositEventLog(abi abi.ABI, data []byte) (*DepositLogs
 // getDepositEventsForBlock looks for the deposit event in the latest block
 func (l *listener) getDepositEventsForBlock(latestBlock *big.Int) error {
 	l.log.Debug("Querying block for deposit events", "block", latestBlock)
+
 	query := buildQuery(l.cfg.bridgeContract, utils.Deposit, latestBlock, latestBlock)
 	depositLogs := make([]*DepositLogs, 0)
 
