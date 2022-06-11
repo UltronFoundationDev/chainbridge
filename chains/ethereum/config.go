@@ -87,7 +87,7 @@ func parseChainConfig(chainCfg *core.ChainConfig) (*Config, error) {
 		http:                      false,
 		startBlock:                big.NewInt(0),
 		blockConfirmations:        big.NewInt(0),
-		blockSuccessRetryInterval: big.NewInt(DefaultBlockSuccessRetryInterval),
+		blockSuccessRetryInterval: big.NewInt(0),
 		egsApiKey:                 "",
 		egsSpeed:                  "",
 	}
@@ -198,7 +198,7 @@ func parseChainConfig(chainCfg *core.ChainConfig) (*Config, error) {
 			return nil, fmt.Errorf("unable to parse %s", BlockSuccessRetryIntervalOpt)
 		}
 	} else {
-		config.blockConfirmations = big.NewInt(DefaultBlockSuccessRetryInterval)
+		config.blockSuccessRetryInterval = big.NewInt(DefaultBlockSuccessRetryInterval)
 		delete(chainCfg.Opts, BlockSuccessRetryIntervalOpt)
 	}
 

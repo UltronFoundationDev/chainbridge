@@ -11,7 +11,7 @@ import (
 )
 
 func (l *listener) handleErc20DepositedEvent(destId msg.ChainId, nonce msg.Nonce, resourceID msg.ResourceId, callData []byte) (msg.Message, error) {
-	l.log.Info("Handling fungible deposit event", "dest", destId, "nonce", nonce)
+	l.log.Info("Handling fungible deposit event", "dest", destId, "nonce", nonce, "rID", resourceID.Hex())
 
 	if len(callData) < 84 {
 		err := errors.New("invalid calldata length: less than 84 bytes")
