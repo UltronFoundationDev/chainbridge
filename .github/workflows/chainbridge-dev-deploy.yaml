@@ -8,14 +8,12 @@ env:
   DEPLOY_ENV: "dev"
 
 on:
+  pull_request:
+    types: 
+      - closed
   push:
     branches:
       - "develop"
-    paths:
-      - ".github/workflows/chainbridge-dev-deploy.yaml"
-      - "/aws/dev/**"
-      - "/aws/terragrunt.hcl"
-      - "/src/**"
 
 jobs:
   deploy_global:
