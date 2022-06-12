@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ChainSafe/ChainBridge/bindings/Bridge"
-	connection "github.com/ChainSafe/ChainBridge/connections/ethereum"
-	utils "github.com/ChainSafe/ChainBridge/shared/ethereum"
-	"github.com/ChainSafe/chainbridge-utils/keystore"
-	"github.com/ChainSafe/chainbridge-utils/msg"
 	"github.com/ChainSafe/log15"
+	"github.com/UltronFoundationDev/chainbridge-utils/keystore"
+	"github.com/UltronFoundationDev/chainbridge-utils/msg"
+	"github.com/UltronFoundationDev/chainbridge/bindings/Bridge"
+	connection "github.com/UltronFoundationDev/chainbridge/connections/ethereum"
+	utils "github.com/UltronFoundationDev/chainbridge/shared/ethereum"
 	"github.com/ethereum/go-ethereum/common"
 )
 

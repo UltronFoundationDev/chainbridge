@@ -7,11 +7,12 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"unsafe"
 
-	"github.com/ChainSafe/ChainBridge/connections/ethereum/egs"
-	utils "github.com/ChainSafe/ChainBridge/shared/ethereum"
-	"github.com/ChainSafe/chainbridge-utils/core"
-	"github.com/ChainSafe/chainbridge-utils/msg"
+	"github.com/UltronFoundationDev/chainbridge-utils/core"
+	"github.com/UltronFoundationDev/chainbridge-utils/msg"
+	"github.com/UltronFoundationDev/chainbridge/connections/ethereum/egs"
+	utils "github.com/UltronFoundationDev/chainbridge/shared/ethereum"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -61,8 +62,13 @@ type Config struct {
 	startBlock                *big.Int
 	blockConfirmations        *big.Int
 	blockSuccessRetryInterval *big.Int
+	decimals                  map[msg.ChainId]map[string][2]int8
 	egsApiKey                 string // API key for ethgasstation to query gas prices
 	egsSpeed                  string // The speed which a transaction should be processed: average, fast, fastest. Default: fast
+}
+
+func b2arr32(b []byte) [32]byte {
+	return *(*[32]byte)(unsafe.Pointer(&b))
 }
 
 // parseChainConfig uses a core.ChainConfig to construct a corresponding Config
@@ -88,6 +94,7 @@ func parseChainConfig(chainCfg *core.ChainConfig) (*Config, error) {
 		startBlock:                big.NewInt(0),
 		blockConfirmations:        big.NewInt(0),
 		blockSuccessRetryInterval: big.NewInt(0),
+		decimals:                  chainCfg.Decimals,
 		egsApiKey:                 "",
 		egsSpeed:                  "",
 	}
@@ -211,8 +218,8 @@ func parseChainConfig(chainCfg *core.ChainConfig) (*Config, error) {
 		config.egsSpeed = speed
 		delete(chainCfg.Opts, EGSSpeed)
 	} else {
-		// Default to "fast"
-		config.egsSpeed = egs.Fast
+		// Default to "average"
+		config.egsSpeed = egs.Average
 		delete(chainCfg.Opts, EGSSpeed)
 	}
 

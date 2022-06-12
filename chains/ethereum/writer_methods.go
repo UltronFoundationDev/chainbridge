@@ -6,15 +6,15 @@ package ethereum
 import (
 	"context"
 	"errors"
-	"github.com/ChainSafe/ChainBridge/bindings/Bridge"
+	"github.com/UltronFoundationDev/chainbridge/bindings/Bridge"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"math/big"
 	"strings"
 	"time"
 
-	utils "github.com/ChainSafe/ChainBridge/shared/ethereum"
-	"github.com/ChainSafe/chainbridge-utils/msg"
 	log "github.com/ChainSafe/log15"
+	"github.com/UltronFoundationDev/chainbridge-utils/msg"
+	utils "github.com/UltronFoundationDev/chainbridge/shared/ethereum"
 )
 
 // Number of blocks to wait for an finalization event

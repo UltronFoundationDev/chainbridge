@@ -5,9 +5,11 @@ package ethereum
 
 import (
 	"errors"
-	"github.com/ChainSafe/chainbridge-utils/msg"
+	"github.com/UltronFoundationDev/chainbridge-utils/msg"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"math"
 	"math/big"
+	"strings"
 )
 
 func (l *listener) handleErc20DepositedEvent(destId msg.ChainId, nonce msg.Nonce, resourceID msg.ResourceId, callData []byte) (msg.Message, error) {
@@ -26,6 +28,31 @@ func (l *listener) handleErc20DepositedEvent(destId msg.ChainId, nonce msg.Nonce
 
 	// amount: first 32 bytes of calldata
 	amount := big.NewInt(0).SetBytes(callData[:32])
+
+	// change amount if difference decimals in destId
+	if len(l.cfg.decimals) != 0 {
+		for chainId, resourceIdDecimals := range l.cfg.decimals {
+			if chainId == destId {
+				for decimalResourceID, decimalsLst := range resourceIdDecimals {
+					if strings.HasPrefix(decimalResourceID, "0x") {
+						decimalResourceID = decimalResourceID[2:]
+					}
+					if decimalResourceID == resourceID.Hex() {
+						difference := decimalsLst[0] - decimalsLst[1]
+						if difference > 0 {
+							differenceDecimals := big.NewInt(int64(math.Pow(10, float64(difference))))
+							amount = big.NewInt(0).Div(amount, differenceDecimals)
+						} else {
+							differenceDecimals := big.NewInt(int64(math.Pow(10, math.Abs(float64(difference)))))
+							amount = big.NewInt(0).Mul(amount, differenceDecimals)
+						}
+						break
+					}
+				}
+				break
+			}
+		}
+	}
 
 	return msg.NewFungibleTransfer(
 		l.cfg.id,
