@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	utils "github.com/ChainSafe/ChainBridge/shared/ethereum"
-	"github.com/ChainSafe/chainbridge-utils/core"
+	"github.com/UltronFoundationDev/chainbridge-utils/core"
+	utils "github.com/UltronFoundationDev/chainbridge/shared/ethereum"
 	"github.com/ethereum/go-ethereum/common"
 )
 

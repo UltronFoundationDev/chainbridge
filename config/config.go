@@ -6,6 +6,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/UltronFoundationDev/chainbridge-utils/msg"
 	"os"
 	"path/filepath"
 
@@ -25,12 +26,13 @@ type Config struct {
 
 // RawChainConfig is parsed directly from the config file and should be using to construct the core.ChainConfig
 type RawChainConfig struct {
-	Name     string            `json:"name"`
-	Type     string            `json:"type"`
-	Id       string            `json:"id"`       // ChainID
-	Endpoint string            `json:"endpoint"` // url for rpc endpoint
-	From     string            `json:"from"`     // address of key to use
-	Opts     map[string]string `json:"opts"`
+	Name     string                             `json:"name"`
+	Type     string                             `json:"type"`
+	Id       string                             `json:"id"`       // ChainID
+	Endpoint string                             `json:"endpoint"` // url for rpc endpoint
+	From     string                             `json:"from"`     // address of key to use
+	Opts     map[string]string                  `json:"opts"`
+	Decimals map[msg.ChainId]map[string][2]int8 `json:"decimals"`
 }
 
 func NewConfig() *Config {

@@ -8,8 +8,8 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/ChainSafe/ChainBridge/bindings/GenericHandler"
-	"github.com/ChainSafe/chainbridge-utils/msg"
+	"github.com/UltronFoundationDev/chainbridge-utils/msg"
+	"github.com/UltronFoundationDev/chainbridge/bindings/GenericHandler"
 	"github.com/ethereum/go-ethereum/common"
 )
 

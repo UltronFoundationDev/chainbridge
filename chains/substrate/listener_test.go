@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	utils "github.com/ChainSafe/ChainBridge/shared/substrate"
-	subtest "github.com/ChainSafe/ChainBridge/shared/substrate/testing"
-	"github.com/ChainSafe/chainbridge-utils/blockstore"
-	"github.com/ChainSafe/chainbridge-utils/msg"
+	"github.com/UltronFoundationDev/chainbridge-utils/blockstore"
+	"github.com/UltronFoundationDev/chainbridge-utils/msg"
+	utils "github.com/UltronFoundationDev/chainbridge/shared/substrate"
+	subtest "github.com/UltronFoundationDev/chainbridge/shared/substrate/testing"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 

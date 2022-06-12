@@ -15,14 +15,14 @@ import (
 
 	"strconv"
 
-	"github.com/ChainSafe/ChainBridge/chains/ethereum"
-	"github.com/ChainSafe/ChainBridge/chains/substrate"
-	"github.com/ChainSafe/ChainBridge/config"
-	"github.com/ChainSafe/chainbridge-utils/core"
-	"github.com/ChainSafe/chainbridge-utils/metrics/health"
-	metrics "github.com/ChainSafe/chainbridge-utils/metrics/types"
-	"github.com/ChainSafe/chainbridge-utils/msg"
 	log "github.com/ChainSafe/log15"
+	"github.com/UltronFoundationDev/chainbridge-utils/core"
+	"github.com/UltronFoundationDev/chainbridge-utils/metrics/health"
+	metrics "github.com/UltronFoundationDev/chainbridge-utils/metrics/types"
+	"github.com/UltronFoundationDev/chainbridge-utils/msg"
+	"github.com/UltronFoundationDev/chainbridge/chains/ethereum"
+	"github.com/UltronFoundationDev/chainbridge/chains/substrate"
+	"github.com/UltronFoundationDev/chainbridge/config"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/urfave/cli/v2"
 )
@@ -185,6 +185,7 @@ func run(ctx *cli.Context) error {
 			FreshStart:     ctx.Bool(config.FreshStartFlag.Name),
 			LatestBlock:    ctx.Bool(config.LatestBlockFlag.Name),
 			Opts:           chain.Opts,
+			Decimals:       chain.Decimals,
 		}
 		var newChain core.Chain
 		var m *metrics.ChainMetrics

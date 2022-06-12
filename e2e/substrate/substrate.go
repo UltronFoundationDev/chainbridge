@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	utils "github.com/ChainSafe/ChainBridge/shared/substrate"
-	"github.com/ChainSafe/chainbridge-utils/core"
-	"github.com/ChainSafe/chainbridge-utils/keystore"
-	"github.com/ChainSafe/chainbridge-utils/msg"
 	"github.com/ChainSafe/log15"
+	"github.com/UltronFoundationDev/chainbridge-utils/core"
+	"github.com/UltronFoundationDev/chainbridge-utils/keystore"
+	"github.com/UltronFoundationDev/chainbridge-utils/msg"
+	utils "github.com/UltronFoundationDev/chainbridge/shared/substrate"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 

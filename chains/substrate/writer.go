@@ -9,12 +9,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ChainSafe/chainbridge-utils/core"
+	"github.com/UltronFoundationDev/chainbridge-utils/core"
 
-	utils "github.com/ChainSafe/ChainBridge/shared/substrate"
-	metrics "github.com/ChainSafe/chainbridge-utils/metrics/types"
-	"github.com/ChainSafe/chainbridge-utils/msg"
 	"github.com/ChainSafe/log15"
+	metrics "github.com/UltronFoundationDev/chainbridge-utils/metrics/types"
+	"github.com/UltronFoundationDev/chainbridge-utils/msg"
+	utils "github.com/UltronFoundationDev/chainbridge/shared/substrate"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 

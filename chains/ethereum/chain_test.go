@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	ethtest "github.com/ChainSafe/ChainBridge/shared/ethereum/testing"
-	"github.com/ChainSafe/chainbridge-utils/core"
-	"github.com/ChainSafe/chainbridge-utils/keystore"
-	"github.com/ChainSafe/chainbridge-utils/msg"
+	"github.com/UltronFoundationDev/chainbridge-utils/core"
+	"github.com/UltronFoundationDev/chainbridge-utils/keystore"
+	"github.com/UltronFoundationDev/chainbridge-utils/msg"
+	ethtest "github.com/UltronFoundationDev/chainbridge/shared/ethereum/testing"
 	"github.com/ethereum/go-ethereum/common"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
