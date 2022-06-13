@@ -5,7 +5,6 @@ package ethereum
 
 import (
 	"errors"
-	"fmt"
 	"github.com/UltronFoundationDev/chainbridge-utils/msg"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"math"
@@ -29,7 +28,6 @@ func (l *listener) handleErc20DepositedEvent(destId msg.ChainId, nonce msg.Nonce
 
 	// amount: first 32 bytes of calldata
 	amount := big.NewInt(0).SetBytes(callData[:32])
-	fmt.Println(amount)
 
 	// change amount if difference decimals in destId
 	if len(l.cfg.decimals) != 0 {
@@ -54,7 +52,6 @@ func (l *listener) handleErc20DepositedEvent(destId msg.ChainId, nonce msg.Nonce
 			}
 		}
 	}
-	fmt.Println(amount)
 
 	return msg.NewFungibleTransfer(
 		l.cfg.id,
