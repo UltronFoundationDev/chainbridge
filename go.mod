@@ -4,8 +4,8 @@ go 1.18
 
 require (
 	github.com/ChainSafe/chainbridge-substrate-events v0.0.0-20200715141113-87198532025e
-	github.com/UltronFoundationDev/chainbridge-utils v1.0.7
 	github.com/ChainSafe/log15 v1.0.0
+	github.com/UltronFoundationDev/chainbridge-utils v1.0.8
 	github.com/centrifuge/go-substrate-rpc-client v2.0.0+incompatible
 	github.com/ethereum/go-ethereum v1.10.18
 	github.com/prometheus/client_golang v1.4.1

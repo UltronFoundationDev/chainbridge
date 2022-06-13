@@ -6,14 +6,12 @@ package ethereum
 import (
 	"errors"
 	"fmt"
-	"math/big"
-	"unsafe"
-
 	"github.com/UltronFoundationDev/chainbridge-utils/core"
 	"github.com/UltronFoundationDev/chainbridge-utils/msg"
 	"github.com/UltronFoundationDev/chainbridge/connections/ethereum/egs"
 	utils "github.com/UltronFoundationDev/chainbridge/shared/ethereum"
 	"github.com/ethereum/go-ethereum/common"
+	"math/big"
 )
 
 const DefaultGasLimit = 6721975
@@ -62,13 +60,9 @@ type Config struct {
 	startBlock                *big.Int
 	blockConfirmations        *big.Int
 	blockSuccessRetryInterval *big.Int
-	decimals                  map[msg.ChainId]map[string][2]int8
+	decimals                  map[msg.ChainId]map[string][2]uint8
 	egsApiKey                 string // API key for ethgasstation to query gas prices
 	egsSpeed                  string // The speed which a transaction should be processed: average, fast, fastest. Default: fast
-}
-
-func b2arr32(b []byte) [32]byte {
-	return *(*[32]byte)(unsafe.Pointer(&b))
 }
 
 // parseChainConfig uses a core.ChainConfig to construct a corresponding Config
