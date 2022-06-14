@@ -1,2 +1,2 @@
 #!/bin/sh
-./bridge --config /config/config.json
+./bridge --config /config/config.json --verbosity trace
