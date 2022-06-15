@@ -27,7 +27,7 @@ terraform {
   # Note: the double slash (//) is intentional and required. It's part of Terraform's Git syntax for module sources.
   # See: https://www.terraform.io/docs/modules/sources.html
   # Terraform may display a "Terraform initialized in an empty directory" warning, but you can safely ignore it.)
-  source = format("%s//chainbridge", find_in_parent_folders("src"))
+  source = format("%s//regional", find_in_parent_folders("src"))
 }
 
 inputs = {
