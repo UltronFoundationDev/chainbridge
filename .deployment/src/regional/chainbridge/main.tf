@@ -1,5 +1,5 @@
 locals {
-  ec2_instance_name = "${var.project_name}-${var.environment}-${var.module_name}"
+  ec2_instance_name = "${var.project_name}-${var.environment}-${var.module_name}-node"
   resource_prefix = format("%s-%s-%s",
     var.project_name,
     var.environment,
@@ -103,19 +103,20 @@ resource "aws_instance" "chainbridge_node" {
   iam_instance_profile = join("", aws_iam_instance_profile.chainbridge_profile.*.name)
   user_data = base64encode(templatefile("${path.module}/templates/node-userdata.tpl.sh",
     {
-      aws_account_id       = var.aws_account_id
-      project_name         = var.project_name
-      module_name          = var.module_name
-      aws_region           = var.aws_region
-      environment          = var.environment
-      aws_ec2_iam_role     = join("", aws_iam_role.chainbridge_role.*.name)
-      ec2_instance_name    = "${var.project_name}-${var.module_name}-node-${each.key}"
-      base64_file          = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["base64_file"]
-      base64_jsonconfig    = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["base64_jsonconfig"]
-      chainbridge_id       = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["chainbridge_id"]
-      chainbridge_pubkey   = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["chainbridge_pubkey"]
-      address              = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["address"]
-      chainbridge_password = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["chainbridge_password"]
+      aws_account_id                = var.aws_account_id
+      project_name                  = var.project_name
+      module_name                   = var.module_name
+      aws_region                    = var.aws_region
+      environment                   = var.environment
+      aws_ec2_iam_role              = join("", aws_iam_role.chainbridge_role.*.name)
+      ec2_instance_name             = "${local.ec2_instance_name}-${each.key}"
+      chainbridge_configs_s3_bucket = var.chainbridge_configs_s3_bucket
+      base64_file                   = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["base64_file"]
+      base64_jsonconfig             = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["base64_jsonconfig"]
+      chainbridge_id                = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["chainbridge_id"]
+      chainbridge_pubkey            = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["chainbridge_pubkey"]
+      address                       = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["address"]
+      chainbridge_password          = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["chainbridge_password"]
     }
   ))
   key_name               = join("", aws_key_pair.chainbridge_ssh_key.*.key_name)

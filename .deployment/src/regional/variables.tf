@@ -31,35 +31,10 @@ variable "create" {
   default     = true
 }
 
-variable "ec2_instance_type" {
-  description = "The type of the instance."
-  type        = string
-}
-
-variable "volume_type" {
-  description = "The type of root EBS volume."
-  type        = string
-}
-
-variable "volume_size" {
-  description = "The size of root EBS volume."
-  type        = number
-}
-
 variable "ec2_instance_fqdn" {
   description = "Fully Qualified Domain Name for the EC2 instance."
   type        = string
   default     = null
-}
-
-variable "instance_class" {
-  description = "The RDS instance class."
-  type        = string
-}
-
-variable "engine_version" {
-  description = "The postgres engine version."
-  type        = string
 }
 
 variable "domain_name" {
