@@ -14,7 +14,7 @@ on:
   push:
     branches:
       - "main"
-      - "fix/ci"
+      
 jobs:
   deploy_global:
     name: Deploy Global resources
