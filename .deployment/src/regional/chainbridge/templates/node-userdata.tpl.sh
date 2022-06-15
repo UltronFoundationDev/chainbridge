@@ -49,10 +49,9 @@ mkdir -p /${module_name}/{blockstore,configs,keyfiles}
 
 echo ${base64_file} | base64 -d > /${module_name}/keyfiles/${address}.key --ignore-garbage
 
-sudo aws s3 cp "s3://${chainbridge_configs_s3_bucket}/${ec2_instance_name}.json" "/${module_name}/configs/${ec2_instance_name}.json"
-aws s3 ls > /${module_name}/configs/s3.list
+sudo aws s3 cp "s3://${chainbridge_configs_s3_bucket}/${ec2_instance_name}.json" "/${module_name}/configs/config.json"
 
-echo ${base64_jsonconfig} | base64 -d > /${module_name}/configs/config.json --ignore-garbage
+# echo ${base64_jsonconfig} | base64 -d > /${module_name}/configs/config.json --ignore-garbage
 
 echo ${chainbridge_password} | base64 -d > /${module_name}/configs/password --ignore-garbage
 

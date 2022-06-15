@@ -19,7 +19,7 @@ module "s3_bucket" {
   restrict_public_buckets = true
 
   versioning = {
-    enabled = false
+    enabled = true
   }
 
 }
