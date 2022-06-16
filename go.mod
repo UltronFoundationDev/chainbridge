@@ -7,7 +7,7 @@ require (
 	github.com/ChainSafe/log15 v1.0.0
 	github.com/UltronFoundationDev/chainbridge-utils v1.0.8
 	github.com/centrifuge/go-substrate-rpc-client v2.0.0+incompatible
-	github.com/ethereum/go-ethereum v1.10.18
+	github.com/ethereum/go-ethereum v1.10.19
 	github.com/prometheus/client_golang v1.4.1
 	github.com/rs/zerolog v1.26.1
 	github.com/stretchr/testify v1.7.0
