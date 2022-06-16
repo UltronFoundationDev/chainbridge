@@ -43,6 +43,18 @@ resource "aws_iam_policy" "chainbridge_iam_policy" {
           "Resource" : [
             "*"
           ]
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "s3:ListBucket",
+            "s3:GetObject"
+          ],
+          "Resource" : [
+            "arn:aws:s3:::${var.chainbridge_configs_s3_bucket}",
+            "arn:aws:s3:::${var.chainbridge_configs_s3_bucket}/*"
+          ]
+
         }
       ]
     }

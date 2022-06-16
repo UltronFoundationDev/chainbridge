@@ -33,6 +33,7 @@ blockstore/
 # Chainbridge
 config.toml
 config/config*.json
+config/ultron-prod-chainbridge-node*.json
 config.json
 config/config.json
 *.block

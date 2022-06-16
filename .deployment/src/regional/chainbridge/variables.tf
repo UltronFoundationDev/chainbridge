@@ -6,7 +6,7 @@ variable "project_name" {
 variable "module_name" {
   description = "The name of the module"
   type        = string
-  default     = "graph-node"
+  default     = "chainbridge"
 }
 
 variable "aws_region" {
@@ -54,4 +54,9 @@ variable "ec2_instance_name" {
   description = "The type of the instance."
   type        = string
   default     = ""
+}
+
+variable "chainbridge_configs_s3_bucket" {
+  description = "The name of S3 bucket."
+  type        = string
 }
