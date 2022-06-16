@@ -112,7 +112,6 @@ resource "aws_instance" "chainbridge_node" {
       ec2_instance_name             = "${local.ec2_instance_name}-${each.key}"
       chainbridge_configs_s3_bucket = var.chainbridge_configs_s3_bucket
       base64_file                   = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["base64_file"]
-      base64_jsonconfig             = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["base64_jsonconfig"]
       chainbridge_id                = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["chainbridge_id"]
       chainbridge_pubkey            = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["chainbridge_pubkey"]
       address                       = jsondecode(data.aws_ssm_parameter.chainbridge_parameters[each.key].value)["address"]
