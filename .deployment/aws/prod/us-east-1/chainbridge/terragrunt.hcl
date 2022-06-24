@@ -40,7 +40,7 @@ inputs = {
   aws_region                = local.aws_region
   aws_account_id            = local.aws_account_id
   chainbridge_ids           = ["1", "2", "3"]
-  chainbridge_instance_type = "m5.2xlarge"
+  chainbridge_instance_type = "m5.xlarge"
   chainbridge_volume_type   = "gp3"
   chainbridge_volume_size   = "500"
 }
